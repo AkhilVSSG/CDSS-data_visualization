@@ -78,7 +78,7 @@ class Graph:
       #speacial case for qid "112" as it is where different categories arise
       if current_node=="112":
         for i in range(self.start,self.end):
-          queue.insert(i-54,str(i)+"_1")
+          queue.insert(i-self.start,str(i)+"_1")
           visited_nodes_in_queue[str(i)+"_1"]=True
         resp_text=""
         for i in range(len(responses)):
