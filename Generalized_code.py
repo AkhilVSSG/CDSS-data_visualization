@@ -10,6 +10,7 @@ import os
 
 class Graph:
   def __init__(self,data,category):
+    ''' this is the default constructor to save data category, starting repsonse and ending response of the respective category'''
     self.data=data
     self.category=category[0]
     self.start=category[1][0]
@@ -24,19 +25,16 @@ class Graph:
   def pre_procesing(self):
     '''This is the stage where the queue is added with the required questions and add the nodes to the graph'''
 
-    responses_102=self.data["questions"]["102"]["responses"] #loading responses of question qith qid "102"
-    responses_102_text=""
-    for i in range(len(responses_102)):
-      responses_102_text+=str(i+1)+". "+responses_102[i]["prompt"]["text"]["1"]+"("+responses_102[i]["value"]+") \n" #converting the reponses into a form which can be stored as a title for the node "102" in the graph
+    for node in ['102','111']:
+      resp=self.data["questions"][node]["responses"]#loading responses of question of the respective node
+        
+      resp_ans=""
+        
+      for i in range(len(resp)):
+        resp_ans+=str(i+1)+". "+resp[i]["prompt"]["text"]["1"]+"("+resp[i]["value"]+") \n"#converting the reponses into a form which can be stored as a title for the node in the graph
 
-    responses_111=self.data["questions"]["111"]["responses"] #loading responses of question qith qid "111"
-    responses_111_text=""
-    for i in range(len(responses_111)):
-      responses_111_text+=str(i+1)+". "+responses_111[i]["prompt"]["text"]["1"]+"("+responses_111[i]["value"]+") \n" #converting the reponses into a form which can be stored as a title for the node "111" in the graph
-
-    # adding nodes to the graph with the created title(with questions and its respective options)
-    self.Directed_Graph.add_node("102",title="Question: "+self.data["questions"]["102"]["prompt"]["text"]["1"]+"\nType: "+self.data["questions"]["102"]["type"]+"\nOptions: \n"+responses_102_text)
-    self.Directed_Graph.add_node("111",title="Question: "+self.data["questions"]["111"]["prompt"]["text"]["1"]+"\nType: "+self.data["questions"]["111"]["type"]+"\nOptions: \n"+responses_111_text)
+      # adding nodes to the graph with the created title(with questions and its respective options)
+      self.Directed_Graph.add_node(node,title="Question: "+self.data["questions"][node]["prompt"]["text"]["1"]+"\nType: "+self.data["questions"][node]["type"]+"\nOptions: \n"+resp_ans)
 
     self.node_collection()
 
@@ -73,13 +71,13 @@ class Graph:
         resp_text+=str(i+1)+". "+responses[i]["prompt"]["text"]["1"]+"("+responses[i]["value"]+") \n"
 
       
-      self.traversed_nodes.append(current_node)
+      self.traversed_nodes.append(current_node) #adding the current_node to the traversed node list
 
       #speacial case for qid "112" as it is where different categories arise
       if current_node=="112":
         for i in range(self.start,self.end):
-          queue.insert(i-self.start,str(i)+"_1")
-          visited_nodes_in_queue[str(i)+"_1"]=True
+          queue.insert(i-self.start,str(i)+"_1") #adding the correspoinding responses for a particular category from the start to end of the category
+          visited_nodes_in_queue[str(i)+"_1"]=True #making the visited nodes as true
         resp_text=""
         for i in range(len(responses)):
           '''below conditons are to just modify the spacing and alignment of the repsonses in the tile keeping 4 responses in one line
@@ -155,15 +153,15 @@ class Graph:
     print("process for "+self.category+" has been completed!!")
     
 def main():
-  file = open('../store.json')
+  file = open('../../store.json')
   data = json.load(file) #loading the json
   categories=[["Ear_Nose_Throat",[12,45]],["Existing_health_condition",[45,54]],["Eye",[54,64]],["Fever",[64,65]],["genito_uninary",[65,80]],["Head",[80,88]],["Mental_health",[88,95]],["Respiratory",[95,102]],["Skin",[102,106]],["Stomach_problem",[106,116]]]
   print("Enter the option of category for which you need an edgelist and visual representation\n")
   for i in range(len(categories)):
     print(str(i+1)+". "+categories[i][0])
   category=int(input("Enter your choice: "))
-  output=Graph(data,categories[category-1])
-  output.Graph_initialization()
+  output=Graph(data,categories[category-1]) #creating a class Grpah
+  output.Graph_initialization() #calling the main fucntion for the process of creating a network
   
 
 
